@@ -1,15 +1,20 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
+//#define DUO
+#define DRV8825
+//#define DIRECT_DRIVE_EXTRUDER
+//#define SERIAL_COMPATIBILITY // Needed for some linux distros. Switches baudrate to 115200 for to maximise compatibility at the cost of some serial speed.
+
 // This configurtion file contains the basic settings.
 // Advanced settings can be found in Configuration_adv.h 
 // BASIC SETTINGS: select your board type, temperature sensor type, axis scaling, and endstop configuration
 
-//User specified version info of this build to display in [Pronterface, etc] terminal window during startup.
+//User specified version info of THIS file to display in [Pronterface, etc] terminal window during startup.
 //Implementation of an idea by Prof Braino to inform user that any changes made
 //to this build by the user have been successfully uploaded into firmware.
-#define STRING_VERSION_CONFIG_H __DATE__ " " __TIME__ // build date and time
-#define STRING_CONFIG_H_AUTHOR "(none, default config)" //Who made the changes.
+#define STRING_VERSION_CONFIG_H "2013-04-03" // build date and time
+#define STRING_CONFIG_H_AUTHOR "Deezmaker" //Who made the changes.
 
 // SERIAL_PORT selects which serial port should be used for communication with the host.
 // This allows the connection of wireless adapters (for instance) to non-default port pins.
@@ -17,8 +22,11 @@
 #define SERIAL_PORT 0
 
 // This determines the communication speed of the printer
-#define BAUDRATE 250000
-//#define BAUDRATE 115200
+#ifndef SERIAL_COMPATIBILITY
+  #define BAUDRATE 250000
+#else
+  #define BAUDRATE 115200
+#endif
 
 //// The following define selects which electronics board you have. Please choose the one that matches your setup
 // 10 = Gen7 custom (Alfons3 Version) "https://github.com/Alfons3/Generation_7_Electronics"
@@ -34,11 +42,9 @@
 // 6  = Sanguinololu < 1.2
 // 62 = Sanguinololu 1.2 and above
 // 63 = Melzi
-// 64 = STB V1.1
 // 7  = Ultimaker
 // 71 = Ultimaker (Older electronics. Pre 1.5.4. This is rare)
 // 8  = Teensylu
-// 80 = Rumba
 // 81 = Printrboard (AT90USB1286)
 // 82 = Brainwave (AT90USB646)
 // 9  = Gen3+
@@ -48,7 +54,19 @@
 // 301 = Rambo
 
 #ifndef MOTHERBOARD
-#define MOTHERBOARD 7
+  #ifdef DUO
+    #define MOTHERBOARD 34
+  #else
+    #ifdef __AVR_ATmega1284P__
+      #define MOTHERBOARD 62
+    #else
+      #ifdef __AVR_ATmega2560__
+        #define MOTHERBOARD 34
+      #else
+        #error Oops!  Make sure you have 'Sanguino W/ ATmega1284p 16mhz' for an X1 or 'Arduino Mega 2560' for an X3 selected from the 'Tools -> Boards' menu.
+      #endif
+    #endif
+  #endif
 #endif
 
 //// The following define selects which power supply you have. Please choose the one that matches your setup
@@ -84,10 +102,10 @@
 // 52 is 200k thermistor - ATC Semitec 204GT-2 (1k pullup)
 // 55 is 100k thermistor - ATC Semitec 104GT-2 (Used in ParCan) (1k pullup)
 
-#define TEMP_SENSOR_0 -1
-#define TEMP_SENSOR_1 0
+#define TEMP_SENSOR_0 7
+#define TEMP_SENSOR_1 7
 #define TEMP_SENSOR_2 0
-#define TEMP_SENSOR_BED 0
+#define TEMP_SENSOR_BED 1
 
 // Actual temperature must be close to target for this long before M109 returns success
 #define TEMP_RESIDENCY_TIME 10	// (seconds)
@@ -105,9 +123,9 @@
 // When temperature exceeds max temp, your heater will be switched off.
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
 // You should use MINTEMP for thermistor short/failure protection.
-#define HEATER_0_MAXTEMP 275
-#define HEATER_1_MAXTEMP 275
-#define HEATER_2_MAXTEMP 275
+#define HEATER_0_MAXTEMP 320
+#define HEATER_1_MAXTEMP 320
+#define HEATER_2_MAXTEMP 320
 #define BED_MAXTEMP 150
 
 // If your bed has low resistance e.g. .6 ohm and throws the fuse you can duty cycle it to reduce the
@@ -118,8 +136,8 @@
 // PID settings:
 // Comment the following line to disable PID and enable bang-bang.
 #define PIDTEMP
-#define BANG_MAX 256 // limits current to nozzle while in bang-bang mode; 256=full current
-#define PID_MAX 256 // limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 256=full current
+#define BANG_MAX 256
+#define PID_MAX 256 // limits current to nozzle; 256=full current
 #ifdef PIDTEMP
   //#define PID_DEBUG // Sends debug data to the serial port. 
   //#define PID_OPENLOOP 1 // Puts PID in open loop. M104/M140 sets the output power from 0 to PID_MAX
@@ -130,10 +148,15 @@
   #define PID_dT ((16.0 * 8.0)/(F_CPU / 64.0 / 256.0)) //sampling period of the temperature routine
 
 // If you are using a preconfigured hotend then you can use one of the value sets by uncommenting it
+// Bukobot
+    #define  DEFAULT_Kp 87.89
+    #define  DEFAULT_Ki 3.88
+    #define  DEFAULT_Kd 664.28
+
 // Ultimaker
-    #define  DEFAULT_Kp 22.2
-    #define  DEFAULT_Ki 1.08  
-    #define  DEFAULT_Kd 114  
+//    #define  DEFAULT_Kp 22.2
+//    #define  DEFAULT_Ki 1.08  
+//    #define  DEFAULT_Kd 114  
 
 // Makergear
 //    #define  DEFAULT_Kp 7.0
@@ -190,7 +213,7 @@
 //if PREVENT_DANGEROUS_EXTRUDE is on, you can still disable (uncomment) very long bits of extrusion separately.
 #define PREVENT_LENGTHY_EXTRUDE
 
-#define EXTRUDE_MINTEMP 170
+#define EXTRUDE_MINTEMP 160
 #define EXTRUDE_MAXLENGTH (X_MAX_LENGTH+Y_MAX_LENGTH) //prevent extrusion of very large distances.
 
 //===========================================================================
@@ -256,11 +279,11 @@ const bool Z_ENDSTOPS_INVERTING = true; // set to true to invert the logic of th
 #define min_software_endstops true //If true, axis won't move to coordinates less than HOME_POS.
 #define max_software_endstops true  //If true, axis won't move to coordinates greater than the defined lengths below.
 // Travel limits after homing
-#define X_MAX_POS 205
+#define X_MAX_POS 355
 #define X_MIN_POS 0
 #define Y_MAX_POS 205
 #define Y_MIN_POS 0
-#define Z_MAX_POS 200
+#define Z_MAX_POS 210
 #define Z_MIN_POS 0
 
 #define X_MAX_LENGTH (X_MAX_POS - X_MIN_POS)
@@ -278,13 +301,26 @@ const bool Z_ENDSTOPS_INVERTING = true; // set to true to invert the logic of th
 
 //// MOVEMENT SETTINGS
 #define NUM_AXIS 4 // The axis order in all axis related arrays is X, Y, Z, E
-#define HOMING_FEEDRATE {50*60, 50*60, 4*60, 0}  // set the homing speeds (mm/min)
+#define HOMING_FEEDRATE {50*60, 50*60, 3.5*60, 0}  // set the homing speeds (mm/min)
 
 // default settings 
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {78.7402,78.7402,200*8/3,760*1.1}  // default steps per unit for ultimaker 
-#define DEFAULT_MAX_FEEDRATE          {500, 500, 5, 45}    // (mm/sec)    
-#define DEFAULT_MAX_ACCELERATION      {9000,9000,100,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
+#ifndef DRV8825
+  #ifndef DIRECT_DRIVE_EXTRUDER
+    #define DEFAULT_AXIS_STEPS_PER_UNIT   {55.99,55.99,3200,1260}  // 1/16-step for all axes with 14:1 extruder
+  #else
+    #define DEFAULT_AXIS_STEPS_PER_UNIT   {55.99,55.99,3200,92.6}  // 1/16-step for all axes with direct-drive extruder
+  #endif
+#else
+  #ifndef DIRECT_DRIVE_EXTRUDER
+    #define DEFAULT_AXIS_STEPS_PER_UNIT   {111.98,111.98,6400,630}  // 1/32-step for X/Y/Z, 1/8-step for 14:1 extruder
+  #else
+    #define DEFAULT_AXIS_STEPS_PER_UNIT   {111.98,111.98,6400,185.2}  // 1/32-step for all axes with direct-drive extruder 
+  #endif
+#endif
+
+#define DEFAULT_MAX_FEEDRATE          {500, 500, 3.5, 45}    // (mm/sec)    
+#define DEFAULT_MAX_ACCELERATION      {800,800,100,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
 
 #define DEFAULT_ACCELERATION          3000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves 
 #define DEFAULT_RETRACT_ACCELERATION  3000   // X, Y, Z and E max acceleration in mm/s^2 for r retracts
@@ -310,15 +346,15 @@ const bool Z_ENDSTOPS_INVERTING = true; // set to true to invert the logic of th
 // M501 - reads parameters from EEPROM (if you need reset them after you changed them temporarily).  
 // M502 - reverts to the default "factory settings".  You still need to store them in EEPROM afterwards if you want to.
 //define this to enable eeprom support
-//#define EEPROM_SETTINGS
+#define EEPROM_SETTINGS
 //to disable EEPROM Serial responses and decrease program space by ~1700 byte: comment this out:
 // please keep turned on if you can.
-//#define EEPROM_CHITCHAT
+#define EEPROM_CHITCHAT
 
 //LCD and SD support
 //#define ULTRA_LCD  //general lcd support, also 16x2
 //#define DOGLCD	// Support for SPI LCD 128x64 (Controller ST7565R graphic Display Family)
-//#define SDSUPPORT // Enable SD Card Support in Hardware Console
+#define SDSUPPORT // Enable SD Card Support in Hardware Console
 
 //#define ULTIMAKERCONTROLLER //as available from the ultimaker online store.
 //#define ULTIPANEL  //the ultipanel as on thingiverse
@@ -338,35 +374,26 @@ const bool Z_ENDSTOPS_INVERTING = true; // set to true to invert the logic of th
 #endif 
 
 // Preheat Constants
-#define PLA_PREHEAT_HOTEND_TEMP 180 
-#define PLA_PREHEAT_HPB_TEMP 70
-#define PLA_PREHEAT_FAN_SPEED 255		// Insert Value between 0 and 255
+  #define PLA_PREHEAT_HOTEND_TEMP 170 
+  #define PLA_PREHEAT_HPB_TEMP 60
+  #define PLA_PREHEAT_FAN_SPEED 255		// Insert Value between 0 and 255
 
-#define ABS_PREHEAT_HOTEND_TEMP 240
-#define ABS_PREHEAT_HPB_TEMP 100
-#define ABS_PREHEAT_FAN_SPEED 255		// Insert Value between 0 and 255
+  #define ABS_PREHEAT_HOTEND_TEMP 210
+  #define ABS_PREHEAT_HPB_TEMP 110
+  #define ABS_PREHEAT_FAN_SPEED 255		// Insert Value between 0 and 255
 
 
 #ifdef ULTIPANEL
 //  #define NEWPANEL  //enable this if you have a click-encoder panel
   #define SDSUPPORT
   #define ULTRA_LCD
-	#ifdef DOGLCD	// Change number of lines to match the DOG graphic display
-		#define LCD_WIDTH 20
-		#define LCD_HEIGHT 5
-	#else
-		#define LCD_WIDTH 20
-		#define LCD_HEIGHT 4
-	#endif
+  #define LCD_WIDTH 20
+  #define LCD_HEIGHT 4
+  
 #else //no panel but just lcd 
   #ifdef ULTRA_LCD
-	#ifdef DOGLCD	// Change number of lines to match the 128x64 graphics display
-		#define LCD_WIDTH 20
-		#define LCD_HEIGHT 5
-	#else
-		#define LCD_WIDTH 16
-		#define LCD_HEIGHT 2
-	#endif    
+    #define LCD_WIDTH 16
+    #define LCD_HEIGHT 2    
   #endif
 #endif
 
