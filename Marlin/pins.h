@@ -416,9 +416,9 @@
       #define BEEPER 33	 // Beeper on AUX-4
 
       //buttons are directly attached using AUX-2
-      #define BTN_EN1 37
-      #define BTN_EN2 35
-      #define BTN_ENC 31  //the click
+      #define BTN_EN1 7
+      #define BTN_EN2 22
+      #define BTN_ENC -1  //the click
 
       #ifdef G3D_PANEL
         #define SDCARDDETECT 49
@@ -758,7 +758,7 @@
      //The encoder and click button
      #define BTN_EN1 11  //must be a hardware interrupt pin
      #define BTN_EN2 10 //must be hardware interrupt pin
-     #define BTN_ENC 16  //the switch
+     #define BTN_ENC -1  //the switch
      //not connected to a pin
      #define SDCARDDETECT -1
      
